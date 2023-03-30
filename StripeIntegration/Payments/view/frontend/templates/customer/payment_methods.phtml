@@ -1,0 +1,67 @@
+<?php
+
+$methods = $this->getSavedPaymentMethods();
+
+if (empty($methods)): ?>
+<div class="message info empty saved-payment-methods">
+  <span><?php echo $block->escapeHtml(__('You do not have any saved payment methods.')); ?></span>
+</div>
+<?php else: ?>
+  <div class="table-wrapper stripe-payments saved-payment-methods">
+    <table class="data table table-order-items history saved-cards" id="my-orders-table">
+      <caption class="table-caption"><?php echo __('Saved payment methods'); ?></caption>
+      <thead>
+        <tr>
+          <th scope="col" class="col cards">
+            <?php echo $block->escapeHtml(__('Payment Method')); ?>
+          </th>
+          <th scope="col" class="col actions"><?php echo __('Actions'); ?></th>
+        </tr>
+      </thead>
+      <tbody>
+  <?php foreach ($methods as $type => $method): ?>
+    <tr>
+      <td data-th="Payment Method" class="col brand saved-payment-method-name">
+        <img src="<?php echo $method['icon']; ?>" height="32" class="saved-payment-method-icon" />
+        <label><?php echo $method['label']; ?></label>
+      </td>
+      <td data-th="Actions" class="col actions">
+        <a href="<?php echo $block->getUrl('*/*/*', ['delete' => $method['id'], 'fingerprint' => $method['fingerprint']]); ?>" class="stripe-payments delete-method"
+          onclick="return confirm('<?php echo __("Are you sure you want to delete this payment method?"); ?>')">
+          <?php echo $block->escapeHtml(__('Delete')); ?>
+        </a>
+      </td>
+    </tr>
+  <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+<?php endif; ?>
+
+<div class="add-new-payment-method">
+  <legend class="legend"><span><?php echo __('Add a new payment method'); ?></span></legend>
+
+  <div data-bind="scope: 'payment_method_stripe_payments'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+  </div>
+
+  <script type="text/javascript">
+    // Not the best place to have this, but it offers a performance benefit (one less API call). The template is non-cacheable.
+    window.initParams = <?php echo $this->getInitParams(); ?>;
+
+    require([ 'uiLayout' ], function (layout)
+    {
+        layout([
+            {
+                component: 'StripeIntegration_Payments/js/view/ui_components/setup_element',
+                name: 'payment_method_stripe_payments',
+                method: 'stripe_payments',
+                item: {
+                    method: 'stripe_payments'
+                }
+            }
+        ]);
+    });
+  </script>
+
+</div>

@@ -1,0 +1,178 @@
+<?php
+
+$subscriptions = $this->getSubscriptions();
+$paymentMethods = $this->getCustomerPaymentMethods();
+
+if (empty($subscriptions)): ?>
+<div class="message info empty">
+  <span><?php echo __("You do not have any subscriptions yet."); ?></span>
+</div>
+<?php else: ?>
+  <div class="table-wrapper stripe-subscriptions">
+    <table class="data table table-order-items history" id="my-orders-table">
+      <caption class="table-caption"><?php echo __("Subscriptions"); ?></caption>
+      <thead>
+        <tr>
+          <th scope="col" class="col order"><?php echo __("Order #"); ?></th>
+          <th scope="col" class="col id"><?php echo __("Subscription"); ?></th>
+          <th scope="col" class="col status"><?php echo __("Actions"); ?></th>
+        </tr>
+      </thead>
+      <tbody>
+  <?php foreach ($subscriptions as $subscription): ?>
+    <?php $stripeSubscriptionModel = $block->getSubscriptionModel($subscription); ?>
+        <tr class="<?php echo $subscription->id; ?>">
+          <td data-th="Order #" class="col order">
+            <a href="viewOrder/<?php echo $subscription->metadata["Order #"]; ?>">
+              <?php echo $subscription->metadata["Order #"]; ?>
+            </a>
+          </td>
+          <td data-th="<?php echo __("Subscription"); ?>" class="col id">
+            <div class="subscription-name">
+              <?php echo implode(", ", $this->getInvoiceItems($subscription)); ?>
+            </div>
+            <div class="billed">
+              <?php echo $stripeSubscriptionModel->getFormattedBilling(); ?>
+            </div>
+            <div class="<?php echo $subscription->id; ?> payment-method stripe-subscription-edit">
+              <div class="static section">
+                <div class="details stripe-payments">
+                  <?php $paymentMethod = $block->getSubscriptionDefaultPaymentMethod($subscription); ?>
+                  <?php if ($paymentMethod): ?>
+                    <img class="icon" src="<?php echo $paymentMethod['icon']; ?>" alt="<?php echo $paymentMethod['brand']; ?>">
+                    <span class="label"><?php echo $paymentMethod['label']; ?></span>
+                    <?php if (!empty($paymentMethod['exp_month'])): ?>
+                      <span class="exp">
+                        <?php echo $paymentMethod['exp_month']; ?>/<?php echo $paymentMethod['exp_year']; ?>
+                      </span>
+                    <?php endif; ?>
+                  <?php else: ?>
+                    <?php echo __("No payment method."); ?>
+                  <?php endif; ?>
+                </div>
+              </div>
+              <div class="mutable section">
+                <b><?php echo __("Select a payment method:"); ?></b><br>
+                <form action="changeCard/<?php echo $subscription->id; ?>" method="POST">
+                  <div class="details">
+                    <?php $paymentMethodId = $block->getSubscriptionPaymentMethodId($subscription); ?>
+                    <?php foreach ($paymentMethods as $paymentMethod): ?>
+                      <div class="subscription-card stripe-payments">
+                        <input type="radio" id="<?php echo $subscription->id . "_" . $paymentMethod['id']; ?>"
+                              name="subscription_card"
+                              value="<?php echo $paymentMethod['id']; ?>"
+                              <?php if ($paymentMethodId == $paymentMethod['id']) echo "checked"; ?>>
+
+                        <label for="<?php echo $subscription->id . "_" . $paymentMethod['id']; ?>">
+                          <img class="icon" src="<?php echo $paymentMethod['icon']; ?>" alt="<?php echo $paymentMethod['brand']; ?>">
+                          <span class="label"><?php echo $paymentMethod['label']; ?></span>
+                          <?php if (!empty($paymentMethod['exp_month'])): ?>
+                            <span class="exp">
+                              <?php echo $paymentMethod['exp_month']; ?>/<?php echo $paymentMethod['exp_year']; ?>
+                            </span>
+                          <?php endif; ?>
+                        </label>
+                      </div>
+                    <?php endforeach; ?>
+                  </div>
+                  <div class="actions">
+                    <button type="submit" class="action primary"><?php echo __("Save"); ?></button>
+                    <button type="button" onclick="stripe.cancelEditSubscription('<?php echo $subscription->id; ?>')">
+                      <?php echo __("Cancel"); ?>
+                    </button>
+                    <?php echo __("or"); ?>
+                    <a href="<?php echo $this->getUrl('stripe/customer/paymentmethods'); ?>"><?php echo __("add a new method"); ?></a>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <?php if ($stripeSubscriptionModel->canUpgradeDowngrade()): ?>
+            <div class="<?php echo $subscription->id; ?> upgrade-downgrade stripe-subscription-edit">
+              <div class="mutable section">
+                <form class="form box-tocart subscription-update" data-mage-init='{"validation": {}}'>
+                  <input type="hidden" name="update" value="<?php echo $subscription->id; ?>">
+                  <fieldset class="fieldset">
+
+                    <?php echo $block->getSubscriptionUpdateOptions($subscription); ?>
+
+                    <div class="field qty">
+                        <label class="label" for="qty"><span><?php echo __("Qty"); ?></span></label>
+                        <div class="control">
+                            <input type="number" name="qty" id="qty" min="0" value="<?php echo $block->getConfigurableSubscriptionQty($subscription); ?>" title="Qty" class="input-text qty" data-validate="{'required-number':true,'validate-item-quantity':{'minAllowed':1,'maxAllowed':10000}}">
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                      <button type="submit" class="action primary update"><?php echo __("Update"); ?></button>
+                      <button type="button" onclick="stripe.cancelEditSubscription('<?php echo $subscription->id; ?>')">
+                        <?php echo __("Cancel"); ?>
+                      </button>
+                    </div>
+
+                  </fieldset>
+                </form>
+              </div>
+            </div>
+            <?php endif; ?>
+          </td>
+          <td data-th="Actions" class="col">
+            <div class="stripe-actions-dropdown">
+              <span class="action toggle" data-toggle="dropdown" aria-haspopup="true"
+                data-mage-init='{"dropdown":{}}'
+                >
+                <span>
+                  <svg aria-hidden="true" class="SVGInline-svg SVGInline--cleaned-svg SVG-svg Icon-svg Icon--more-svg Button-icon-svg Icon-color-svg Icon-color--inherit-svg" height="16" width="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2 10a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" fill-rule="evenodd"></path></svg>
+                </span>
+              </span>
+              <ul class="dropdown-options" data-target="dropdown">
+                <?php if ($stripeSubscriptionModel->canUpgradeDowngrade()): ?>
+                <li>
+                  <span class="item" onclick="javascript:stripe.editSubscription('<?php echo $subscription->id; ?>', 'upgrade-downgrade')">
+                    <a href="javascript:void(0);"><?php echo __("Change subscription"); ?></a>
+                  </span>
+                </li>
+                <?php endif; ?>
+                <li>
+                  <span class="item" onclick="javascript:stripe.editSubscription('<?php echo $subscription->id; ?>', 'payment-method')">
+                    <a href="javascript:void(0);"><?php echo __("Change payment method"); ?></a>
+                  </span>
+                </li>
+                <?php if ($stripeSubscriptionModel->canChangeShipping()): ?>
+                <li>
+                  <span class="item">
+                    <a href="<?php echo $block->getUrl('stripe/customer/subscriptions/changeShipping/' . $subscription->id); ?>"><?php echo __("Change shipping details"); ?></a>
+                  </span>
+                </li>
+                <?php endif; ?>
+                <li class="cancel">
+                  <span class="item">
+                    <a href="cancel/<?php echo $subscription->id; ?>" class="action delete"
+                      onclick="return confirm('<?php echo __("Are you sure you want to cancel this subscription?"); ?>');">
+                      <?php echo __("Cancel subscription"); ?>
+                    </a>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+  <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+<?php endif; ?>
+
+<script type="text/javascript">
+
+    require(['domReady!', 'jquery', 'mage/translate', 'Magento_Customer/js/customer-data', 'mage/mage'], function(domReady, $, $t, customerData)
+    {
+      customerData.initStorage();
+      customerData.invalidate(['cart']);
+      // customerData.reload(['cart'], true);
+
+      $("button.update").click(function(e){
+        customerData.invalidate(['cart']);
+        // customerData.reload(['cart'], true);
+      });
+    });
+</script>

@@ -1,0 +1,25 @@
+<?php
+$employees = $block->getAllEmployees();
+?>
+
+<?php if (count($employees) > 0): ?>
+    <table border="1">
+        <tr>
+            <th><?= __("ID") ?></th>
+            <th><?= __("First Name") ?></th>
+            <th><?= __("Last Name") ?></th>
+            <th><?= __("Email Id") ?></th>
+        </tr>
+        <?php foreach ($employees as $employee): ?>
+            <tr>
+                <td><?= $employee->getEmployeeId() ?>
+                <td><?= $employee->getFirstName() ?>
+                <td><?= $employee->getLastName() ?>
+                <td><?= $employee->getEmailId() ?>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+<?php else: ?>
+    <h1><?= __("You have no employees yet :(") ?></h1>
+<?php endif; ?>
+<hr/>

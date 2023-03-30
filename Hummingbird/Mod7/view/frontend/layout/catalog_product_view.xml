@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="3columns" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="product.info.main">
+            <block class="Hummingbird\Mod7\Block\Message" name="Hummingbird_Mod7_Product" 
+                       template="Hummingbird_Mod7::message.phtml" before="product.info.price"/>
+             </referenceContainer>
+    </body> 
+</page>

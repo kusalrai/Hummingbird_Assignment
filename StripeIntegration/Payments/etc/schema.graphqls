@@ -1,0 +1,8 @@
+input PaymentMethodInput {
+    stripe_payments: StripePaymentsInput @doc(description:"Required input for Stripe Payments")
+}
+
+input StripePaymentsInput {
+    save_payment_method: Boolean @doc(description: "Specify whether the payment method should be saved")
+    cc_stripejs_token: String! @doc(description:"Stripe.js generated payment method token")
+}

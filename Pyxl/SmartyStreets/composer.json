@@ -1,0 +1,23 @@
+{
+    "name": "pyxl/module-smartystreets",
+    "description": "Magento 2 module integrates with SmartyStreets SDK for address validation.",
+    "require": {
+        "php": "7.4",
+        "magento/magento-composer-installer": "*",
+        "smartystreets/phpsdk": "4.16.10"
+    },
+    "type": "magento2-module",
+    "version": "1.0.13",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Pyxl\\SmartyStreets\\": ""
+        }
+    }
+}

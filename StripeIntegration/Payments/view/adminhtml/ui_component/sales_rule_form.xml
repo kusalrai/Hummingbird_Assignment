@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="stripe_subscriptions" sortOrder="20">
+        <settings>
+            <collapsible>true</collapsible>
+            <label translate="true">Subscriptions by Stripe</label>
+        </settings>
+        <fieldset name="coupons_config" sortOrder="10">
+            <settings>
+                <collapsible>true</collapsible>
+                <label translate="true">Coupon Duration</label>
+            </settings>
+            <field name="coupon_duration" formElement="select">
+                <settings>
+                    <dataType>text</dataType>
+                    <label translate="true">Applies</label>
+                    <dataScope>coupon_duration</dataScope>
+                    <notice translate="true">
+                        DEPRECATION WARNING - Expiring discount coupons only apply with the embedded payment flow.
+                    </notice>
+                </settings>
+                <formElements>
+                    <select>
+                        <settings>
+                            <options>
+                                <option name="1" xsi:type="array">
+                                    <item name="value" xsi:type="string">forever</item>
+                                    <item name="label" xsi:type="string" translate="true">Forever</item>
+                                </option>
+                                <option name="2" xsi:type="array">
+                                    <item name="value" xsi:type="string">once</item>
+                                    <item name="label" xsi:type="string" translate="true">Once</item>
+                                </option>
+                                <option name="3" xsi:type="array">
+                                    <item name="value" xsi:type="string">repeating</item>
+                                    <item name="label" xsi:type="string" translate="true">Multiple months</item>
+                                </option>
+                            </options>
+                            <caption translate="true">-- Please Select --</caption>
+                        </settings>
+                    </select>
+                </formElements>
+            </field>
+
+            <field name="coupon_months" formElement="input">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="source" xsi:type="string">sales_rule</item>
+                    </item>
+                </argument>
+                <settings>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    </validation>
+                    <dataType>text</dataType>
+                    <label translate="true">Number of months</label>
+                    <dataScope>coupon_months</dataScope>
+                    <notice translate="true">
+                        This value is only used if the coupon duration is "Multiple months".
+                    </notice>
+                </settings>
+            </field>
+
+        </fieldset>
+    </fieldset>
+</form>

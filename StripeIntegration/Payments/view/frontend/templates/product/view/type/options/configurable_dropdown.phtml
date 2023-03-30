@@ -1,0 +1,27 @@
+<?php
+/** @var $block \StripeIntegration\Payments\Block\Customer\ConfigurableSubscription */
+$_product    = $block->getProduct();
+$_attributes = $block->decorateArray($block->getAllowAttributes());
+?>
+<?php if ($_product->isSaleable() && count($_attributes)) :?>
+    <?php foreach ($_attributes as $_attribute) : ?>
+        <div class="field configurable required">
+            <label class="label left" for="attribute<?= $block->escapeHtmlAttr($_attribute->getAttributeId()) ?>">
+                <span><?= $block->escapeHtml($_attribute->getProductAttribute()->getStoreLabel()) ?></span>
+            </label>
+            <div class="control">
+                <select name="super_attribute[<?= $block->escapeHtmlAttr($_attribute->getAttributeId()) ?>]"
+                        data-selector="super_attribute[<?= $block->escapeHtmlAttr($_attribute->getAttributeId()) ?>]"
+                        data-validate="{required:true}"
+                        id="attribute<?= $block->escapeHtmlAttr($_attribute->getAttributeId()) ?>"
+                        class="super-attribute-select">
+                    <?php foreach ($block->getUpdateOptions($_attribute) as $option): ?>
+                    <option value="<?php echo $option['value_index']; ?>" <?php echo $option['is_selected'] ? "selected" : ''; ?> >
+                        <?php echo $option['store_label'] ?: $option['default_label']; ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif;?>
